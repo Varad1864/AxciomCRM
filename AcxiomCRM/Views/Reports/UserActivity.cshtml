@@ -1,0 +1,56 @@
+@{
+    ViewData["Title"] = "Team Productivity & Activity Report";
+    var stats = (IEnumerable<dynamic>)ViewBag.UserStats;
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-decoration-none small text-muted"><i class="fa-solid fa-arrow-left me-1"></i> Back to Reports</a>
+    <h3 class="fw-bold mt-1 mb-0">Team Productivity & Activity Report</h3>
+    <p class="text-secondary mb-0">Operational breakdown of CRM ownership and execution across users.</p>
+</div>
+
+<div class="table-card">
+    <div class="card-header">
+        <i class="fa-solid fa-chart-user text-primary me-2"></i> User Ownership & Engagement Metrics
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Assigned Customers</th>
+                    <th>Assigned Leads</th>
+                    <th>Assigned Opportunities</th>
+                    <th>Scheduled Follow-Ups</th>
+                    <th>Logged Activities</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in stats)
+                {
+                    <tr>
+                        <td class="fw-bold">@s.User.FullName</td>
+                        <td>@s.User.Email</td>
+                        <td>
+                            @if (s.User.IsActive)
+                            {
+                                <span class="badge bg-success-subtle text-success border">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td class="fw-semibold">@s.Customers</td>
+                        <td class="fw-semibold">@s.Leads</td>
+                        <td class="fw-bold text-primary">@s.Opportunities</td>
+                        <td>@s.FollowUps</td>
+                        <td>@s.Activities</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

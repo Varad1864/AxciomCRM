@@ -1,0 +1,134 @@
+@model AcxiomCRM.Models.Opportunity
+@{
+    ViewData["Title"] = $"Opportunity - {Model.OpportunityName}";
+    var followUps = (IEnumerable<AcxiomCRM.Models.FollowUp>)ViewBag.FollowUps;
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <a asp-action="Index" class="text-decoration-none small text-muted"><i class="fa-solid fa-arrow-left me-1"></i> Back to Pipeline</a>
+        <h3 class="fw-bold mt-1 mb-0">@Model.OpportunityName</h3>
+        <span class="text-secondary small">Created: @Model.CreatedDate.ToString("MMM dd, yyyy") &bull; Status: @Model.Status</span>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.OpportunityId" class="btn btn-primary rounded-pill px-3">
+            <i class="fa-solid fa-pen-to-square me-1"></i> Edit Opportunity
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-handshake text-success me-2"></i> Deal Commercials</h5>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Stage</span>
+                    <span class="badge @(Model.Stage == "Won" ? "bg-success" : (Model.Stage == "Lost" ? "bg-danger" : "bg-primary")) fs-6 px-3 py-1">
+                        @Model.Stage
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Deal Value</span>
+                    <h3 class="fw-bold text-dark mb-0">@Model.Amount.ToString("C0")</h3>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Win Probability</span>
+                    <div class="fw-bold fs-5 text-primary">@Model.Probability%</div>
+                    <div class="small text-muted">Weighted Forecast: <strong class="text-success">@Model.WeightedPipeline.ToString("C0")</strong></div>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Expected Close Date</span>
+                    <span class="fw-semibold">@Model.ExpectedCloseDate.ToString("MMMM dd, yyyy")</span>
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Linked Account / Prospect</span>
+                    @if (Model.Customer != null)
+                    {
+                        <a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerId" class="fw-bold text-decoration-none">
+                            <i class="fa-solid fa-building me-1"></i> @Model.Customer.CustomerName
+                        </a>
+                    }
+                    else if (Model.Lead != null)
+                    {
+                        <a asp-controller="Leads" asp-action="Details" asp-route-id="@Model.LeadId" class="fw-bold text-decoration-none">
+                            <i class="fa-solid fa-user me-1"></i> @Model.Lead.LeadName (Lead)
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Unlinked</span>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <span class="text-muted small d-block">Deal Owner</span>
+                    <span class="badge bg-primary-subtle text-primary border">
+                        <i class="fa-solid fa-user me-1"></i> @(Model.AssignedUser?.FullName ?? "Unassigned")
+                    </span>
+                </div>
+
+                <div>
+                    <span class="text-muted small d-block">Strategic Notes</span>
+                    <p class="small text-secondary mb-0">@(string.IsNullOrWhiteSpace(Model.Notes) ? "No notes recorded." : Model.Notes)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <!-- Follow-Ups for this deal -->
+        <div class="table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fa-solid fa-calendar-check text-primary me-2"></i> Deal Action Items & Follow-ups</span>
+                @if (Model.CustomerId.HasValue)
+                {
+                    <a asp-controller="FollowUps" asp-action="Create" asp-route-customerId="@Model.CustomerId" class="btn btn-sm btn-outline-primary rounded-pill">
+                        <i class="fa-solid fa-plus me-1"></i> Add Action Item
+                    </a>
+                }
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (followUps.Any())
+                        {
+                            @foreach (var f in followUps)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@f.Subject</td>
+                                    <td>@f.FollowUpDate.ToString("MMM dd, yyyy")</td>
+                                    <td><span class="badge bg-light text-dark border">@f.FollowUpType</span></td>
+                                    <td>
+                                        <span class="badge @(f.Status == "Completed" ? "bg-success" : "bg-warning text-dark")">
+                                            @f.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No follow-ups recorded for this client.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

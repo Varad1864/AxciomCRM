@@ -1,0 +1,154 @@
+@model IEnumerable<AcxiomCRM.Models.Activity>
+@{
+    ViewData["Title"] = "Activity Touchpoints";
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <h3 class="fw-bold mb-1">Activity Management</h3>
+        <p class="text-secondary mb-0">Review completed and pending client engagements: Calls, Meetings, Emails, and Tasks.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Create" class="btn btn-primary rounded-pill px-3">
+            <i class="fa-solid fa-plus me-1"></i> Log Activity
+        </a>
+    </div>
+</div>
+
+<!-- Filters (Section 17.13) -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-3 p-md-4">
+        <form method="get" asp-action="Index" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <select name="activityType" class="form-select">
+                    <option value="">All Activity Types</option>
+                    <option value="Call" selected="@(ViewBag.CurrentType == "Call")">Call</option>
+                    <option value="Meeting" selected="@(ViewBag.CurrentType == "Meeting")">Meeting</option>
+                    <option value="Email" selected="@(ViewBag.CurrentType == "Email")">Email</option>
+                    <option value="Task" selected="@(ViewBag.CurrentType == "Task")">Task</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="Completed" selected="@(ViewBag.CurrentStatus == "Completed")">Completed</option>
+                    <option value="In Progress" selected="@(ViewBag.CurrentStatus == "In Progress")">In Progress</option>
+                    <option value="Pending" selected="@(ViewBag.CurrentStatus == "Pending")">Pending</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100 rounded-3">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="fa-solid fa-list-check text-primary me-2"></i> Client Touchpoint History</span>
+        <span class="badge bg-secondary">Total: @ViewBag.TotalCount</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light small text-secondary">
+                <tr>
+                    <th>Type</th>
+                    <th>Subject</th>
+                    <th>Account / Contact</th>
+                    <th>Activity Date</th>
+                    <th>Status</th>
+                    <th>Logged By</th>
+                </tr>
+            </thead>
+            <tbody class="small">
+                @if (Model.Any())
+                {
+                    @foreach (var a in Model)
+                    {
+                        <tr>
+                            <td>
+                                @if (a.ActivityType == "Call")
+                                {
+                                    <span class="badge bg-primary-subtle text-primary border"><i class="fa-solid fa-phone me-1"></i> Call</span>
+                                }
+                                else if (a.ActivityType == "Meeting")
+                                {
+                                    <span class="badge bg-success-subtle text-success border"><i class="fa-solid fa-handshake me-1"></i> Meeting</span>
+                                }
+                                else if (a.ActivityType == "Email")
+                                {
+                                    <span class="badge bg-info-subtle text-info border"><i class="fa-solid fa-envelope me-1"></i> Email</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning-subtle text-warning-emphasis border"><i class="fa-solid fa-check me-1"></i> Task</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="fw-bold">@a.Subject</div>
+                                @if (!string.IsNullOrWhiteSpace(a.Description))
+                                {
+                                    <div class="text-muted" style="font-size: 0.78rem;">@a.Description</div>
+                                }
+                            </td>
+                            <td>
+                                @if (a.Customer != null)
+                                {
+                                    <a asp-controller="Customers" asp-action="Details" asp-route-id="@a.CustomerId" class="text-decoration-none">
+                                        @a.Customer.CustomerName
+                                    </a>
+                                }
+                                else if (a.Lead != null)
+                                {
+                                    <a asp-controller="Leads" asp-action="Details" asp-route-id="@a.LeadId" class="text-decoration-none">
+                                        @a.Lead.LeadName (Lead)
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">General</span>
+                                }
+                            </td>
+                            <td>@a.ActivityDate.ToString("MMM dd, yyyy h:mm tt")</td>
+                            <td>
+                                <span class="badge @(a.Status == "Completed" ? "bg-success" : "bg-warning text-dark")">
+                                    @a.Status
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-secondary border">
+                                    @(a.AssignedUser?.FullName ?? "User")
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">No activity records logged.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (ViewBag.TotalPages > 1)
+    {
+        <div class="card-footer bg-white d-flex justify-content-between align-items-center py-3">
+            <span class="small text-muted">Page @ViewBag.CurrentPage of @ViewBag.TotalPages</span>
+            <ul class="pagination pagination-sm mb-0">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                        <a class="page-link" asp-action="Index" 
+                           asp-route-page="@i" 
+                           asp-route-activityType="@ViewBag.CurrentType" 
+                           asp-route-status="@ViewBag.CurrentStatus">@i</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+</div>

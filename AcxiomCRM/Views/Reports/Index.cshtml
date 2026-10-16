@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Reports & Business Intelligence";
+}
+
+<div class="mb-4">
+    <h3 class="fw-bold mb-1">Reports & Analytics Hub</h3>
+    <p class="text-secondary mb-0">Role-based analytics, pipeline forecasting, conversion rates, and activity metrics.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+            <div class="p-3 bg-primary-subtle text-primary rounded-3 d-inline-block mb-3" style="width: fit-content;">
+                <i class="fa-solid fa-chart-line fs-3"></i>
+            </div>
+            <h5 class="fw-bold">Pipeline Report</h5>
+            <p class="text-secondary small">Comprehensive stage-wise and owner-wise pipeline valuation, probabilities, and weighted estimates.</p>
+            <a asp-action="Pipeline" class="btn btn-outline-primary btn-sm rounded-pill mt-auto">View Pipeline Report</a>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+            <div class="p-3 bg-success-subtle text-success rounded-3 d-inline-block mb-3" style="width: fit-content;">
+                <i class="fa-solid fa-arrow-progress fs-3"></i>
+            </div>
+            <h5 class="fw-bold">Conversion Report</h5>
+            <p class="text-secondary small">Lead qualification rates, lead-to-opportunity conversions, and closed deal win/loss ratios.</p>
+            <a asp-action="Conversion" class="btn btn-outline-success btn-sm rounded-pill mt-auto">View Conversion Report</a>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+            <div class="p-3 bg-warning-subtle text-warning-emphasis rounded-3 d-inline-block mb-3" style="width: fit-content;">
+                <i class="fa-solid fa-calendar-check fs-3"></i>
+            </div>
+            <h5 class="fw-bold">Follow-Up Report</h5>
+            <p class="text-secondary small">Analysis of planned, completed, missed, and overdue customer engagements.</p>
+            <a asp-action="FollowUps" class="btn btn-outline-warning text-dark btn-sm rounded-pill mt-auto">View Follow-Up Report</a>
+        </div>
+    </div>
+
+    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+    {
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <div class="p-3 bg-info-subtle text-info-emphasis rounded-3 d-inline-block mb-3" style="width: fit-content;">
+                    <i class="fa-solid fa-users-viewfinder fs-3"></i>
+                </div>
+                <h5 class="fw-bold">Team Activity Report</h5>
+                <p class="text-secondary small">Productivity breakdown: customers, leads, opportunities, and activities across sales personnel.</p>
+                <a asp-action="UserActivity" class="btn btn-outline-info text-dark btn-sm rounded-pill mt-auto">View Team Activity</a>
+            </div>
+        </div>
+    }
+</div>

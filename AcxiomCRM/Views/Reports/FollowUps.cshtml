@@ -1,0 +1,87 @@
+@model IEnumerable<AcxiomCRM.Models.FollowUp>
+@{
+    ViewData["Title"] = "Follow-Up Engagements Report";
+    var now = DateTime.UtcNow;
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-decoration-none small text-muted"><i class="fa-solid fa-arrow-left me-1"></i> Back to Reports</a>
+    <h3 class="fw-bold mt-1 mb-0">Follow-Up & Engagement Status Report</h3>
+    <p class="text-secondary mb-0">Planned, completed, missed, and overdue activities.</p>
+</div>
+
+<!-- Follow-Up KPI Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-secondary small fw-semibold text-uppercase">Planned / Pending</span>
+            <h3 class="fw-bold mt-2 mb-0 text-primary">@ViewBag.PlannedCount</h3>
+            <small class="text-muted">On schedule</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-secondary small fw-semibold text-uppercase">Completed Activities</span>
+            <h3 class="fw-bold mt-2 mb-0 text-success">@ViewBag.CompletedCount</h3>
+            <small class="text-muted">Executed touchpoints</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-secondary small fw-semibold text-uppercase">Overdue Follow-Ups</span>
+            <h3 class="fw-bold mt-2 mb-0 text-danger">@ViewBag.OverdueCount</h3>
+            <small class="text-muted">Requires urgent action</small>
+        </div>
+    </div>
+    <div class="col-sm-6 col-md-3">
+        <div class="stat-card">
+            <span class="text-secondary small fw-semibold text-uppercase">Missed Follow-Ups</span>
+            <h3 class="fw-bold mt-2 mb-0 text-warning">@ViewBag.MissedCount</h3>
+            <small class="text-muted">Needs rescheduling</small>
+        </div>
+    </div>
+</div>
+
+<div class="table-card">
+    <div class="card-header">
+        <i class="fa-solid fa-calendar-check text-primary me-2"></i> Engagement Log
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Subject</th>
+                    <th>Type</th>
+                    <th>Linked Account</th>
+                    <th>Scheduled Date</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var f in Model)
+                {
+                    bool isOverdue = f.Status == "Planned" && f.FollowUpDate < now;
+                    <tr>
+                        <td class="fw-bold">@f.Subject</td>
+                        <td><span class="badge bg-light text-dark border">@f.FollowUpType</span></td>
+                        <td>@(f.Customer?.CustomerName ?? f.Lead?.LeadName ?? "N/A")</td>
+                        <td>
+                            <span class="@(isOverdue ? "text-danger fw-bold" : "")">
+                                @f.FollowUpDate.ToString("yyyy-MM-dd HH:mm")
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge @(f.Status == "Completed" ? "bg-success" : (f.Status == "Missed" ? "bg-danger" : (isOverdue ? "bg-danger" : "bg-warning text-dark")))">
+                                @(isOverdue ? "Overdue" : f.Status)
+                            </span>
+                        </td>
+                        <td>@(f.AssignedUser?.FullName ?? "Unassigned")</td>
+                        <td class="text-muted">@(f.Remarks ?? "-")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,107 @@
+@model AcxiomCRM.Models.FollowUp
+@{
+    ViewData["Title"] = "Schedule Follow-Up";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <a asp-action="Index" class="text-decoration-none small text-muted"><i class="fa-solid fa-arrow-left me-1"></i> Back to Follow-Ups</a>
+                <h3 class="fw-bold mt-1 mb-0">Schedule CRM Follow-Up</h3>
+            </div>
+            <span class="badge bg-primary-subtle text-primary border px-3 py-2 rounded-pill">Mandatory Business Validation</span>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <form asp-action="Create" method="post" id="followUpForm">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small py-2 mb-4"></div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="Subject" class="form-label fw-semibold">Subject / Objective <span class="text-danger">*</span></label>
+                            <input asp-for="Subject" class="form-control" placeholder="e.g. Solution Demo and Architecture Discussion" required />
+                            <span asp-validation-for="Subject" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="FollowUpType" class="form-label fw-semibold">Activity Type <span class="text-danger">*</span></label>
+                            <select asp-for="FollowUpType" class="form-select">
+                                <option value="Call">Phone Call</option>
+                                <option value="Meeting">Meeting (In-person / Virtual)</option>
+                                <option value="Email">Email Communication</option>
+                                <option value="Demo">Product Demonstration</option>
+                            </select>
+                            <span asp-validation-for="FollowUpType" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="FollowUpDate" class="form-label fw-semibold">Follow-Up Date & Time <span class="text-danger">*</span></label>
+                            <input asp-for="FollowUpDate" type="datetime-local" class="form-control" required id="followUpDateInput" />
+                            <span asp-validation-for="FollowUpDate" class="text-danger small"></span>
+                            <small class="text-muted" style="font-size: 0.75rem;">Cannot be earlier than today for a new/planned follow-up.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CustomerId" class="form-label fw-semibold">Customer Account</label>
+                            <select asp-for="CustomerId" asp-items="ViewBag.CustomerId" class="form-select">
+                                <option value="">-- Optional (If Customer) --</option>
+                            </select>
+                            <span asp-validation-for="CustomerId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="LeadId" class="form-label fw-semibold">Prospective Lead</label>
+                            <select asp-for="LeadId" asp-items="ViewBag.LeadId" class="form-select">
+                                <option value="">-- Optional (If Lead) --</option>
+                            </select>
+                            <span asp-validation-for="LeadId" class="text-danger small"></span>
+                        </div>
+
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                        {
+                            <div class="col-12">
+                                <label asp-for="AssignedTo" class="form-label fw-semibold">Assign Sales Representative</label>
+                                <select asp-for="AssignedTo" asp-items="ViewBag.UsersList" class="form-select">
+                                    <option value="">-- Select Representative --</option>
+                                </select>
+                                <span asp-validation-for="AssignedTo" class="text-danger small"></span>
+                            </div>
+                        }
+
+                        <div class="col-12">
+                            <label asp-for="Remarks" class="form-label fw-semibold">Notes / Agenda</label>
+                            <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Key topics to discuss, prerequisites, or preparation notes..."></textarea>
+                            <span asp-validation-for="Remarks" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-light px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="fa-solid fa-calendar-check me-1"></i> Save Schedule
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Set minimum datetime for client-side enforcement
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const currentDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+        document.getElementById('followUpDateInput').setAttribute('min', `${year}-${month}-${day}T00:00`);
+    </script>
+}

@@ -1,0 +1,95 @@
+@{
+    ViewData["Title"] = "Sales & Conversion Report";
+}
+
+<div class="mb-4">
+    <a asp-action="Index" class="text-decoration-none small text-muted"><i class="fa-solid fa-arrow-left me-1"></i> Back to Reports</a>
+    <h3 class="fw-bold mt-1 mb-0">Sales & Conversion Performance</h3>
+    <p class="text-secondary mb-0">Lead qualification throughput, conversion ratios, and deal win rates.</p>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Lead Conversion Card -->
+    <div class="col-lg-6">
+        <div class="table-card p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-filter-circle-dollar text-primary me-2"></i> Lead Conversion Metrics</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <span class="text-muted small">Total Captured Leads</span>
+                        <h3 class="fw-bold mb-0">@ViewBag.TotalLeads</h3>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-success-subtle text-success rounded-3">
+                        <span class="small">Converted Leads</span>
+                        <h3 class="fw-bold mb-0">@ViewBag.ConvertedLeads</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="fw-semibold small">Lead Conversion Rate</span>
+                    <span class="fw-bold text-success">@(((double)ViewBag.ConversionRate).ToString("F1"))%</span>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-success" style="width: @(ViewBag.ConversionRate)%"></div>
+                </div>
+            </div>
+
+            <ul class="list-group list-group-flush small">
+                <li class="list-group-item d-flex justify-content-between px-0">
+                    <span>Qualified or In-Progress Leads:</span>
+                    <span class="fw-bold">@ViewBag.QualifiedLeads</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between px-0">
+                    <span>Unqualified / Lost Leads:</span>
+                    <span class="fw-bold text-danger">@ViewBag.LostLeads</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Opportunity Outcome Card -->
+    <div class="col-lg-6">
+        <div class="table-card p-4 h-100">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-trophy text-warning me-2"></i> Opportunity Outcome Metrics</h5>
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div class="p-3 bg-light rounded-3">
+                        <span class="text-muted small">Total Pipeline Deals</span>
+                        <h3 class="fw-bold mb-0">@ViewBag.TotalOpps</h3>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 bg-success-subtle text-success rounded-3">
+                        <span class="small">Won Revenue</span>
+                        <h3 class="fw-bold mb-0">@(((decimal)ViewBag.WonValue).ToString("C0"))</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <span class="fw-semibold small">Opportunity Win Rate</span>
+                    <span class="fw-bold text-primary">@(((double)ViewBag.OppWinRate).ToString("F1"))%</span>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-primary" style="width: @(ViewBag.OppWinRate)%"></div>
+                </div>
+            </div>
+
+            <ul class="list-group list-group-flush small">
+                <li class="list-group-item d-flex justify-content-between px-0">
+                    <span>Closed Won Opportunities:</span>
+                    <span class="fw-bold text-success">@ViewBag.WonOpps</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between px-0">
+                    <span>Closed Lost Opportunities:</span>
+                    <span class="fw-bold text-danger">@ViewBag.LostOpps</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

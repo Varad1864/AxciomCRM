@@ -1,0 +1,151 @@
+@model IEnumerable<AcxiomCRM.Models.Opportunity>
+@{
+    ViewData["Title"] = "Pipeline Report";
+    var stageSummaries = (IEnumerable<dynamic>)ViewBag.StageSummaries;
+    var ownerSummaries = (IEnumerable<dynamic>)ViewBag.OwnerSummaries;
+}
+
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+        <a asp-action="Index" class="text-decoration-none small text-muted"><i class="fa-solid fa-arrow-left me-1"></i> Back to Reports</a>
+        <h3 class="fw-bold mt-1 mb-0">Sales Pipeline & Forecast Report</h3>
+        <p class="text-secondary mb-0">Stage-wise valuation, win probabilities, and weighted pipeline analytics.</p>
+    </div>
+    <a asp-action="ExportOpportunitiesCsv" class="btn btn-outline-secondary rounded-pill">
+        <i class="fa-solid fa-file-csv me-1"></i> Download CSV Export
+    </a>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card">
+            <span class="text-secondary small fw-semibold text-uppercase">Total Open Pipeline</span>
+            <h3 class="fw-bold mt-2 mb-0 text-primary">@(((decimal)ViewBag.TotalPipeline).ToString("C0"))</h3>
+            <small class="text-muted">Unweighted value</small>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card">
+            <span class="text-secondary small fw-semibold text-uppercase">Weighted Pipeline</span>
+            <h3 class="fw-bold mt-2 mb-0 text-success">@(((decimal)ViewBag.TotalWeighted).ToString("C0"))</h3>
+            <small class="text-muted">Probability-adjusted</small>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card">
+            <span class="text-secondary small fw-semibold text-uppercase">Total Opportunities</span>
+            <h3 class="fw-bold mt-2 mb-0">@Model.Count()</h3>
+            <small class="text-muted">In scope</small>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card">
+            <span class="text-secondary small fw-semibold text-uppercase">Closed Won Deals</span>
+            <h3 class="fw-bold mt-2 mb-0 text-success">@Model.Count(o => o.Stage == "Won")</h3>
+            <small class="text-muted">Value: @Model.Where(o => o.Stage == "Won").Sum(o => o.Amount).ToString("C0")</small>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Stage-wise Breakdown (Section 11) -->
+    <div class="col-lg-6">
+        <div class="table-card h-100">
+            <div class="card-header">
+                <i class="fa-solid fa-layer-group text-primary me-2"></i> Stage-Wise Pipeline Breakdown
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Pipeline Stage</th>
+                            <th>Count</th>
+                            <th>Total Amount</th>
+                            <th>Weighted Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in stageSummaries)
+                        {
+                            <tr>
+                                <td class="fw-bold">@s.Stage</td>
+                                <td>@s.Count</td>
+                                <td class="fw-semibold">@(((decimal)s.TotalAmount).ToString("C0"))</td>
+                                <td class="fw-bold text-success">@(((decimal)s.WeightedAmount).ToString("C0"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Owner-wise Breakdown (Section 11) -->
+    <div class="col-lg-6">
+        <div class="table-card h-100">
+            <div class="card-header">
+                <i class="fa-solid fa-users text-success me-2"></i> Owner-Wise Pipeline Breakdown
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 small">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Sales Representative</th>
+                            <th>Deals</th>
+                            <th>Total Managed Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var o in ownerSummaries)
+                        {
+                            <tr>
+                                <td class="fw-bold">@o.Owner</td>
+                                <td>@o.Count</td>
+                                <td class="fw-bold text-dark">@(((decimal)o.TotalAmount).ToString("C0"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Opportunities Table -->
+<div class="table-card">
+    <div class="card-header">
+        <i class="fa-solid fa-list text-primary me-2"></i> Opportunity Inventory Detail
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Opportunity Name</th>
+                    <th>Account</th>
+                    <th>Stage</th>
+                    <th>Amount</th>
+                    <th>Probability</th>
+                    <th>Weighted Value</th>
+                    <th>Close Date</th>
+                    <th>Owner</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var opp in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@opp.OpportunityName</td>
+                        <td>@(opp.Customer?.CustomerName ?? "Prospect")</td>
+                        <td><span class="badge bg-light text-dark border">@opp.Stage</span></td>
+                        <td>@opp.Amount.ToString("C0")</td>
+                        <td>@opp.Probability%</td>
+                        <td class="fw-bold text-success">@opp.WeightedPipeline.ToString("C0")</td>
+                        <td>@opp.ExpectedCloseDate.ToString("MMM dd, yyyy")</td>
+                        <td>@(opp.AssignedUser?.FullName ?? "Unassigned")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

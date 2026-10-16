@@ -1,0 +1,71 @@
+@model AcxiomCRM.Models.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Add New User";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <a asp-action="Index" class="text-decoration-none small text-muted"><i class="fa-solid fa-arrow-left me-1"></i> Back to Users</a>
+                <h3 class="fw-bold mt-1 mb-0">Create Application User</h3>
+            </div>
+            <span class="badge bg-danger-subtle text-danger border px-3 py-2 rounded-pill">Admin Only</span>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 small py-2 mb-4"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                        <input asp-for="FullName" class="form-control" placeholder="e.g. Rachel Green" required />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold">Email Address (Username) <span class="text-danger">*</span></label>
+                        <input asp-for="Email" type="email" class="form-control" placeholder="rachel@acxiom.com" required />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Role" class="form-label fw-semibold">Primary Role <span class="text-danger">*</span></label>
+                        <select asp-for="Role" class="form-select">
+                            <option value="SalesExecutive">Sales Executive</option>
+                            <option value="Manager">Manager</option>
+                            <option value="Admin">Administrator</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Password" class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                            <input asp-for="Password" class="form-control" placeholder="••••••••" required />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ConfirmPassword" class="form-label fw-semibold">Confirm Password <span class="text-danger">*</span></label>
+                            <input asp-for="ConfirmPassword" class="form-control" placeholder="••••••••" required />
+                            <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <a asp-action="Index" class="btn btn-light px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="fa-solid fa-user-check me-1"></i> Create User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
